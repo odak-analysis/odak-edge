@@ -8,7 +8,7 @@ Python 3.11 or newer is required.
 
 ```
 python -m venv .venv
-.venv\Scriptsctivate        # Windows; on Linux/macOS: source .venv/bin/activate
+.venv\Scripts\activate        # Windows; on Linux/macOS: source .venv/bin/activate
 pip install -e .[dev]
 pytest
 ```
