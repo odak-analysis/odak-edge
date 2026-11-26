@@ -1,0 +1,11 @@
+# ODK-42 adds [video] and [model]
+
+[tracker]
+det_thresh = 0.6      # detections scoring at or below this are left out of the main matching
+max_age = 30          # frames a person may go unseen before the track is dropped
+min_hits = 3          # matched frames in a row before a track number is shown (all new tracks show in the first min_hits frames)
+iou_threshold = 0.3   # minimum box overlap to match a detection to a track
+delta_t = 3           # frames back used to estimate a person's direction of motion
+asso_func = "iou"     # overlap measure for later matching rounds (first round is always iou): iou, giou, diou, ciou or ct_dist
+inertia = 0.2         # weight of the motion direction when matching
+use_byte = false      # also match low-score detections (BYTE association)
