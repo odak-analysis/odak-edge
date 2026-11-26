@@ -1,0 +1,21 @@
+[project]
+name = "odak-edge"
+version = "0.1.0"
+description = "ODAK edge module: in-store video analysis"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "filterpy>=1.4.5",
+    "opencv-python>=4.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["analysis*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
