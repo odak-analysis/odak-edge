@@ -108,3 +108,27 @@ def test_detection_without_keypoints():
         for i in range(3):
             out = t.update([det(5 * i)])
     assert out[0].keypoints is None
+
+
+# --- Review fixes ---
+
+def test_person_near_top_left_corner_stays_in_output():
+    # box coordinates plus score are negative: OC-SORT then returns its own estimate, not the box
+    with PersonTracker() as t:
+        counts = [len(t.update([Detection(box=(-80 + i, -120 + i, -10 + i, 10 + i), score=0.9)]))
+                  for i in range(8)]
+    assert counts == [1] * 8
+
+
+def test_close_boxes_keep_their_own_keypoints_and_ids():
+    # 0.01 px apart at x = 1900: the default relative tolerance of np.allclose treats them as equal
+    kpa, kpb = np.full((17, 3), 1.0), np.full((17, 3), 2.0)
+    owner = {}
+    with PersonTracker() as t:
+        for _ in range(10):
+            a = Detection(box=(1900.0, 100.0, 1940.0, 200.0), score=0.9, keypoints=kpa)
+            b = Detection(box=(1900.01, 100.0, 1940.01, 200.0), score=0.9, keypoints=kpb)
+            for p in t.update([a, b]):
+                want = kpa if abs(p.box[0] - 1900.0) < 0.005 else kpb
+                assert p.keypoints is want
+                assert owner.setdefault(p.track_id, id(p.keypoints)) == id(p.keypoints)

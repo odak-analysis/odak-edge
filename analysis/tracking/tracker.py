@@ -44,14 +44,10 @@ class PersonTracker:
             rows = np.empty((0, 5))
         tracked = self._ocsort.update(rows, (1, 1), (1, 1))
 
-        used: set[int] = set()
         people: list[TrackedPerson] = []
-        for x1, y1, x2, y2, tid in tracked:
-            idx = _first_unused_match(valid, (x1, y1, x2, y2), used)
-            if idx is None:
-                continue
-            used.add(idx)
+        for row, idx in _match_rows_to_detections(tracked, valid):
             d = valid[idx]
+            x1, y1, x2, y2, tid = tracked[row]
             people.append(TrackedPerson(
                 track_id=int(tid),
                 box=(float(x1), float(y1), float(x2), float(y2)),
@@ -79,8 +75,25 @@ def _is_valid(d: Detection) -> bool:
     return x2 > x1 and y2 > y1
 
 
-def _first_unused_match(valid, box, used):
-    for i, d in enumerate(valid):
-        if i not in used and np.allclose(d.box, box, atol=1e-6):
-            return i
-    return None
+def _match_rows_to_detections(tracked: np.ndarray, valid: Sequence[Detection]) -> list[tuple[int, int]]:
+    """Pair each OC-SORT output row with the detection it came from.
+
+    OC-SORT gives back the detected box, or its own estimate when the box is
+    partly above or left of the frame. The closest pair (sum of coordinate
+    differences) is paired first, so every detection is used at most once and an
+    exact box always wins over a merely similar one.
+    """
+    if len(tracked) == 0 or not valid:
+        return []
+    boxes = np.array([d.box for d in valid], dtype=np.float64)
+    dist = np.abs(tracked[:, None, :4] - boxes[None, :, :]).sum(axis=2)
+    pairs = sorted(np.ndindex(dist.shape), key=lambda rc: dist[rc])
+    used_rows: set[int] = set()
+    used_dets: set[int] = set()
+    matches: list[tuple[int, int]] = []
+    for row, det in pairs:
+        if row not in used_rows and det not in used_dets:
+            used_rows.add(row)
+            used_dets.add(det)
+            matches.append((row, det))
+    return sorted(matches)
