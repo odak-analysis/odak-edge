@@ -22,6 +22,18 @@ class TrackerConfig:
     use_byte: bool = False
 
     def __post_init__(self) -> None:
+        for name in ("det_thresh", "iou_threshold", "inertia"):
+            v = getattr(self, name)
+            if isinstance(v, bool) or not isinstance(v, (int, float)):
+                raise ValueError(f"{name} must be a number, got {v!r}")
+        for name in ("max_age", "min_hits", "delta_t"):
+            v = getattr(self, name)
+            if isinstance(v, bool) or not isinstance(v, int):
+                raise ValueError(f"{name} must be a whole number, got {v!r}")
+        if not isinstance(self.use_byte, bool):
+            raise ValueError(f"use_byte must be true or false, got {self.use_byte!r}")
+        if not isinstance(self.asso_func, str):
+            raise ValueError(f"asso_func must be a string, got {self.asso_func!r}")
         if not 0 < self.det_thresh < 1:
             raise ValueError(f"det_thresh must be in (0, 1), got {self.det_thresh}")
         if not 0 < self.iou_threshold < 1:
