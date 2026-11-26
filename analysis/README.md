@@ -18,12 +18,12 @@ The analysis program. It reads the camera video inside the store and produces an
 
 | Setting | Meaning |
 |---|---|
-| `det_thresh` | Detections scoring below this are never tracked. |
+| `det_thresh` | Detections scoring at or below this are left out of the main matching. With `use_byte`, those scoring above 0.1 can still extend an existing track, so they can appear in the output. |
 | `max_age` | Frames a person may go unseen before the track is dropped. |
-| `min_hits` | Matched frames before a track number is shown. |
+| `min_hits` | Matched frames in a row before a track number is shown. In the first `min_hits` frames of a run every new track is shown at once. |
 | `iou_threshold` | Minimum box overlap to match a detection to a track. |
 | `delta_t` | Frames back used to estimate a person's direction of motion. |
-| `asso_func` | Overlap measure: `iou`, `giou`, `diou`, `ciou` or `ct_dist`. |
+| `asso_func` | Overlap measure for the later matching rounds (BYTE and re-matching of unmatched tracks): `iou`, `giou`, `diou`, `ciou` or `ct_dist`. The first round always uses IoU. |
 | `inertia` | Weight of the motion direction when matching. |
 | `use_byte` | Also match low-score detections (BYTE association). |
 
