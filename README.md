@@ -2,7 +2,7 @@
 
 The in-store part of ODAK (Observe, Detect, Analyze, Know). It runs on a computer inside the store, reads the store's existing security cameras and turns the video into anonymous, aggregated numbers. Video never leaves the store. This repository also holds the setup tool that is used to install and configure a store.
 
-This repository currently contains the structure only. Code, dependencies and the Python version are added with the first development tasks.
+The first analysis stage reads a single-camera video and estimates person boxes and body keypoints. See [Run person detection](analysis/README.md) for setup and test instructions.
 
 ## Structure
 
